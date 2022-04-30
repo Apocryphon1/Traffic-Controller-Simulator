@@ -49,6 +49,12 @@ public class Main {
                         tc.Colors(colors);
                     }
                 });
+         Config.createStatement("select state from PedestrianButtonClicked")
+                .setSubscriber(new Object() {
+                    public void update(boolean state) throws InterruptedException{
+                        tc.PedestrianButton(state);
+                    }
+                });
     }
 
 }

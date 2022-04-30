@@ -8,7 +8,9 @@ import com.espertech.esper.client.EPServiceProvider;
 import com.espertech.esper.client.EPServiceProviderManager;
 import com.espertech.esper.client.EPStatement;
 import events.LightsColor;
+import events.PedestrianButtonClicked;
 import events.PowerEvent;
+
 import events.TimerReading;
 
 /**
@@ -23,6 +25,7 @@ public class Config {
         engine.getEPAdministrator().getConfiguration().addEventType(PowerEvent.class);
         engine.getEPAdministrator().getConfiguration().addEventType(TimerReading.class);
         engine.getEPAdministrator().getConfiguration().addEventType(LightsColor.class);
+       engine.getEPAdministrator().getConfiguration().addEventType(PedestrianButtonClicked.class);
         System.out.println("Events Successfully Registered.");
     }
 

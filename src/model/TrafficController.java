@@ -24,13 +24,16 @@ public class TrafficController {
 
     // The components
     private Timer timer;
-
+    private PedestrianButton p;
+    
+    
     public TrafficController() {
 
         gui = new trafficcontroller();
         gui.setLocationRelativeTo(null);
         gui.setVisible(true);
         timer = new Timer(this);
+        p= new PedestrianButton();
         timer.start();
         TrafficLights tLights = new TrafficLights(this);
          tLights.start();
@@ -51,11 +54,16 @@ public class TrafficController {
     public Timer getTimer() {
         return timer;
     }
-
+    public PedestrianButton getPButton(){
+        return p;
+    }
     public void timerSignal(int secondss) {
+        
          
-        System.out.println("The time is now " + secondss);
+         
+        System.out.println(secondss+" seconds left.");
          gui.getCurrentTimeTxt().setText(secondss + "");
+          
     }
 
     public void setState(boolean state) {
@@ -67,22 +75,74 @@ public class TrafficController {
 
     public void Colors(ArrayList<String> colors) {
        
-        if (colors.get(0)=="red"){
+        if (colors.get(0)=="redNS"){
+        gui.getNorth().setBackground(Color.red);
+        gui.getSouth().setBackground(Color.red);
+        gui.getEast().setBackground(Color.yellow);
+        gui.getWest().setBackground(Color.yellow);
+        
+        }
+        else if (colors.get(0)=="greenNS"){
+        gui.getNorth().setBackground(Color.green);
+        gui.getSouth().setBackground(Color.green);
+        gui.getEast().setBackground(Color.red);
+        gui.getWest().setBackground(Color.red);
+        }
+        else if(colors.get(0)=="yellowNS"){
+        gui.getNorth().setBackground(Color.yellow);
+        gui.getSouth().setBackground(Color.yellow);
+        gui.getEast().setBackground(Color.green);
+        gui.getWest().setBackground(Color.green);
+        }
+         if (colors.get(0)=="greenEW"){
         gui.getNorth().setBackground(Color.red);
         gui.getSouth().setBackground(Color.red);
         gui.getEast().setBackground(Color.green);
         gui.getWest().setBackground(Color.green);
         
         }
-        else if (colors.get(0)=="green"){
-         gui.getNorth().setBackground(Color.green);
+        else if (colors.get(0)=="redEW"){
+        gui.getNorth().setBackground(Color.green);
         gui.getSouth().setBackground(Color.green);
         gui.getEast().setBackground(Color.red);
         gui.getWest().setBackground(Color.red);
+        }
+        else if(colors.get(0)=="yellowEW"){
+         
+        gui.getNorth().setBackground(Color.red);
+        gui.getSouth().setBackground(Color.red);
+        gui.getEast().setBackground(Color.yellow);
+        gui.getWest().setBackground(Color.yellow);
+        }
+        if (colors.get(0)=="redall"){
+            System.out.println("Our System is being initialized");
+        gui.getNorth().setBackground(Color.red);
+        gui.getSouth().setBackground(Color.red);
+        gui.getEast().setBackground(Color.red);
+        gui.getWest().setBackground(Color.red);
+        
         }
        
         
        
     }
-
+    
+    public void PedestrianButton(boolean state) throws InterruptedException{
+       
+       if(state){
+        System.out.println("Pedestrian Button is pressed!");
+        timer.Reset();
+        
+        gui.getNorth().setBackground(Color.yellow);
+        gui.getSouth().setBackground(Color.yellow);
+        gui.getEast().setBackground(Color.red);
+        gui.getWest().setBackground(Color.red);
+        timer.n=2;
+         gui.getjButton2().setEnabled(!state);
+        
+       }
+       else{
+            gui.getjButton2().setEnabled(!state);
+       }
+    }
 }
