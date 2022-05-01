@@ -14,18 +14,20 @@ import events.PedestrianButtonClicked;
 import events.TimerReading;
 import java.util.ArrayList;
 import view.trafficcontroller;
+
 /**
  *
  * @author User
  */
-public class Timer extends Thread{
+public class Timer extends Thread {
     int secondss;
-    int n=0;
+    int NScounter = 0;
+    int EWcounter = 1;
     PedestrianButton p;
     private trafficcontroller gui;
-  ArrayList<String> Colors;
-  
-  
+    ArrayList<String> ColorsNS;
+    ArrayList<String> ColorsEW;
+
     public int getSeconds() {
         return secondss;
     }
@@ -33,70 +35,94 @@ public class Timer extends Thread{
     public void setSeconds(int seconds) {
         this.secondss = seconds;
     }
-    
+
     private TrafficController tc;
 
-    
     public Timer(TrafficController tcc) {
-        this.Colors = new ArrayList<String>();
-        Colors.add("greenNS");
-        Colors.add("yellowNS");
-         Colors.add("yellowEW");
-         Colors.add("redEW");
-         Colors.add("yellowNS");
-        Colors.add("yellowEW");
-       
-       
-        
+        this.ColorsNS = new ArrayList<String>();
+        ColorsNS.add("red");
+        ColorsNS.add("green");
+        ColorsNS.add("yellow");
+        this.ColorsEW = new ArrayList<String>();
+        ColorsEW.add("red");
+        ColorsEW.add("green");
+        ColorsEW.add("yellow");
+
         this.tc = tcc;
         this.secondss = 0;
     }
-  
-    public void TimesOut(){
-         secondss=1;
-       
-         
-                ArrayList<String> Colory = new ArrayList<String>();
-                Colory.add(Colors.get(n));
-                tc.Colors(Colory);
-                Colory.clear();
-                n++;
-                Config.sendEvent(new PedestrianButtonClicked(false));
-    
-           if(n==5){
-               n=0;
-           }
-    }
-      
-   
-    public void Reset(){
-        secondss=0;
-    }
-   
-     @Override
-    public void run() {
-     
-        while (true) {
-           try {
-            
-             if(tc.isTrafficOn()){
-                
-                 secondss++;
-                 
-              if(secondss==6){
-                  System.out.println("Traffic Light Change!");
-                  TimesOut();
-                  
-              }
-              
-            }
-             
+
+    public void TimesOut(int currentSeconds) {
+        ArrayList<String> Colory = new ArrayList<String>();
+        ArrayList<String> Colorx = new ArrayList<String>();
+
+        if(currentSeconds == 8){
+            secondss = 1;
+        }
         
+        Colory.add(ColorsNS.get(NScounter));
+        Colorx.add(ColorsEW.get(EWcounter));
+        tc.Colors(Colory,Colorx);
+        Colory.clear();
+        Colorx.clear();
+        Config.sendEvent(new PedestrianButtonClicked(false));
+
+        //0 = red, 1 = green, 2 = yellow
+        /* 
+        01
+        02
+        10
+        20 */
+        switch(NScounter){
+            case 0:
+                if (EWcounter == 1 ){
+                    EWcounter++;
+                }  else{
+                    NScounter++;
+                    EWcounter = 0;
+                } 
+                break;
+            case 1:
+                NScounter ++;
+                break;
+            case 2:
+                NScounter = 0;
+                EWcounter ++;
+                break;
+        }
+    }
+
+    public void Reset() {
+        secondss = 0;
+    }
+
+    @Override
+    public void run() {
+
+        while (true) {
+            try {
+
+                if (tc.isTrafficOn()) {
+
+                    secondss++;
+                    
+                    if(secondss == 6 || secondss == 1){
+                        TimesOut(secondss);
+                    }
+
+                    if (secondss == 8) {
+                        System.out.println("Traffic Light Change!");
+                        TimesOut(secondss);
+
+                    }
+
+                }
+
                 this.sleep(1000);
             } catch (InterruptedException ex) {
                 Logger.getLogger(Timer.class.getName()).log(Level.SEVERE, null, ex);
             }
-            
+
             Config.sendEvent(new TimerReading(secondss));
         }
     }

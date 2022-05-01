@@ -80,7 +80,7 @@ public class PedestrianButton extends Thread {
                  while(timer.getSeconds()<5){
                
                   Colors.add("yellow");
-                 tc.Colors(Colors);
+                 tc.Colors(Colors, Colors);
                    timer.setSeconds(sec);
                    sec++;
              }

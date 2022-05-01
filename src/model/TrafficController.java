@@ -73,7 +73,7 @@ public class TrafficController {
 
     }
 
-    public void Colors(ArrayList<String> colors) {
+   /*  public void Colors(ArrayList<String> colors) {
        
         if (colors.get(0)=="redNS"){
         gui.getNorth().setBackground(Color.red);
@@ -126,6 +126,39 @@ public class TrafficController {
         
        
     }
+ */
+    public void Colors(ArrayList<String> colorsNS, ArrayList<String> colorsEW){
+        if(colorsNS.get(0)=="red"){
+            gui.getNorth().setBackground(Color.red);
+            gui.getSouth().setBackground(Color.red);
+        } else if(colorsNS.get(0)=="green"){
+            gui.getNorth().setBackground(Color.green);
+            gui.getSouth().setBackground(Color.green);
+        } else if(colorsNS.get(0)=="yellow"){
+            gui.getNorth().setBackground(Color.yellow);
+            gui.getSouth().setBackground(Color.yellow);
+        }
+
+        if(colorsEW.get(0)=="red"){
+            gui.getEast().setBackground(Color.red);
+            gui.getWest().setBackground(Color.red);
+        } else if(colorsEW.get(0)=="green"){
+            gui.getEast().setBackground(Color.green);
+            gui.getWest().setBackground(Color.green);
+        } else if(colorsEW.get(0)=="yellow"){
+            gui.getEast().setBackground(Color.yellow);
+            gui.getWest().setBackground(Color.yellow);
+        }
+
+        if (colorsNS.get(0)=="redall"){
+            System.out.println("Our System is being initialized");
+            gui.getNorth().setBackground(Color.red);
+            gui.getSouth().setBackground(Color.red);
+            gui.getEast().setBackground(Color.red);
+            gui.getWest().setBackground(Color.red);
+        
+        }
+    }
     
     public void PedestrianButton(boolean state) throws InterruptedException{
        
@@ -137,7 +170,7 @@ public class TrafficController {
         gui.getSouth().setBackground(Color.yellow);
         gui.getEast().setBackground(Color.red);
         gui.getWest().setBackground(Color.red);
-        timer.n=2;
+        //timer.n=2;
          gui.getjButton2().setEnabled(!state);
         
        }

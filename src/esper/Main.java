@@ -45,8 +45,8 @@ public class Main {
                 });
         Config.createStatement("select colors from LightsColor")
                 .setSubscriber(new Object() {
-                    public void update(ArrayList<String> colors) {
-                        tc.Colors(colors);
+                    public void update(ArrayList<String> colorsNS) {
+                        tc.Colors(colorsNS, colorsNS);
                     }
                 });
          Config.createStatement("select state from PedestrianButtonClicked")
