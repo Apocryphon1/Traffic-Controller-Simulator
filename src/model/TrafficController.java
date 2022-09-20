@@ -5,38 +5,54 @@
 package model;
 
 import esper.Config;
+import esper.Main;
+import static esper.Main.main;
 import view.trafficcontroller;
 import events.PowerEvent;
 import java.awt.Color;
+import java.awt.Graphics;
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
  * @author User
  */
-public class TrafficController {
+public class TrafficController extends Thread {
 
-    // The Kettle GUI
-    private trafficcontroller gui;
+    trafficcontroller gui;
 
     // This acts as our ON/OFF switch
     private boolean state = false;
 
     // The components
     private Timer timer;
-    private PedestrianButton p;
-    
-    
-    public TrafficController() {
+    private TrafficLights tLights;
+    private PedestrianButton pNS;
+    private PedestrianButton pEW;
+    private RedLight red;
+    private GreenLight green;
+    private YellowLight yellow;
+    private intersectionSensor sensor;
+    Thread NS = new Thread(pNS);
+    Thread EW = new Thread(pEW);
 
+    public TrafficController() {
+        Car c1 = new Car("car1", 190, 280);
+        Car c2 = new Car("car2", 240, -10);
+        Car c3 = new Car("car3", 0, 110);
+        Car c4 = new Car("car4", 420, 220);
         gui = new trafficcontroller();
         gui.setLocationRelativeTo(null);
         gui.setVisible(true);
         timer = new Timer(this);
-        p= new PedestrianButton();
+        red = new RedLight(this, gui);
+        green = new GreenLight(this, gui);
+        yellow = new YellowLight(this, gui);
         timer.start();
-        TrafficLights tLights = new TrafficLights(this);
-         tLights.start();
+        sensor = new intersectionSensor(this);
     }
 
     public boolean isTrafficOn() {
@@ -54,128 +70,94 @@ public class TrafficController {
     public Timer getTimer() {
         return timer;
     }
-    public PedestrianButton getPButton(){
-        return p;
+
+    public int getCarTimer() {
+        System.out.println(timer.carTimer);
+        return timer.getCarTimer();
     }
+
+    public PedestrianButton getPButtonNS() {
+        return pNS;
+    }
+
+    public PedestrianButton getPButtonEW() {
+        return pEW;
+    }
+
     public void timerSignal(int secondss) {
-        
-         
-         
-        System.out.println(secondss+" seconds left.");
-         gui.getCurrentTimeTxt().setText(secondss + "");
-          
+        gui.getCurrentTimeTxt().setText(secondss + "");
+    }
+
+    public void buttonStatusNS(boolean status) {
+        NS.start();
+        pEW.State(status, "NS");
+    }
+
+    public void setpClickedNS(boolean clicked) {
+        timer.setpClicked(clicked);
+    }
+
+    public void buttonStatusEW(boolean status) {
+        EW.start();
+        pEW.State(status, "EW");
+    }    
+
+    public void setpClickedEW(boolean clicked) {
+        timer.setpClicked(clicked);
     }
 
     public void setState(boolean state) {
         this.state = state;
         gui.getOnBtn().setEnabled(!state);
-
-
+        gui.getOffBtn().setEnabled(state);
     }
 
-   /*  public void Colors(ArrayList<String> colors) {
-       
-        if (colors.get(0)=="redNS"){
-        gui.getNorth().setBackground(Color.red);
-        gui.getSouth().setBackground(Color.red);
-        gui.getEast().setBackground(Color.yellow);
-        gui.getWest().setBackground(Color.yellow);
-        
-        }
-        else if (colors.get(0)=="greenNS"){
-        gui.getNorth().setBackground(Color.green);
-        gui.getSouth().setBackground(Color.green);
-        gui.getEast().setBackground(Color.red);
-        gui.getWest().setBackground(Color.red);
-        }
-        else if(colors.get(0)=="yellowNS"){
-        gui.getNorth().setBackground(Color.yellow);
-        gui.getSouth().setBackground(Color.yellow);
-        gui.getEast().setBackground(Color.green);
-        gui.getWest().setBackground(Color.green);
-        }
-         if (colors.get(0)=="greenEW"){
-        gui.getNorth().setBackground(Color.red);
-        gui.getSouth().setBackground(Color.red);
-        gui.getEast().setBackground(Color.green);
-        gui.getWest().setBackground(Color.green);
-        
-        }
-        else if (colors.get(0)=="redEW"){
-        gui.getNorth().setBackground(Color.green);
-        gui.getSouth().setBackground(Color.green);
-        gui.getEast().setBackground(Color.red);
-        gui.getWest().setBackground(Color.red);
-        }
-        else if(colors.get(0)=="yellowEW"){
-         
-        gui.getNorth().setBackground(Color.red);
-        gui.getSouth().setBackground(Color.red);
-        gui.getEast().setBackground(Color.yellow);
-        gui.getWest().setBackground(Color.yellow);
-        }
-        if (colors.get(0)=="redall"){
-            System.out.println("Our System is being initialized");
-        gui.getNorth().setBackground(Color.red);
-        gui.getSouth().setBackground(Color.red);
-        gui.getEast().setBackground(Color.red);
-        gui.getWest().setBackground(Color.red);
-        
-        }
-       
-        
-       
+    public void updateIntersection() {
+        sensor.intersection();
     }
- */
-    public void Colors(ArrayList<String> colorsNS, ArrayList<String> colorsEW){
-        if(colorsNS.get(0)=="red"){
-            gui.getNorth().setBackground(Color.red);
-            gui.getSouth().setBackground(Color.red);
-        } else if(colorsNS.get(0)=="green"){
-            gui.getNorth().setBackground(Color.green);
-            gui.getSouth().setBackground(Color.green);
-        } else if(colorsNS.get(0)=="yellow"){
-            gui.getNorth().setBackground(Color.yellow);
-            gui.getSouth().setBackground(Color.yellow);
+
+    public String requestChangeDirection(String direction) {
+        sensor.changeDirection(direction);
+        return sensor.getDirection();
+    }
+
+    public void ColorsNS(ArrayList<String> colorsNS) {
+        if (colorsNS.get(0) == "red") {
+            red.setNSRed();
+        } else if (colorsNS.get(0) == "green") {
+            green.setNSGreen();
+        } else if (colorsNS.get(0) == "yellow") {
+            yellow.setNSYellow();
+        }
+  if (colorsNS.get(0) == "redall") {
+            red.allRed();
+
+        }
+      
+    }
+public void ColorsEW(ArrayList<String> colorsEW){
+      if (colorsEW.get(0) == "red") {
+            red.setEWRed();
+        } else if (colorsEW.get(0) == "green") {
+            green.setEWGreen();
+        } else if (colorsEW.get(0) == "yellow") {
+            yellow.setEWYellow();
         }
 
-        if(colorsEW.get(0)=="red"){
-            gui.getEast().setBackground(Color.red);
-            gui.getWest().setBackground(Color.red);
-        } else if(colorsEW.get(0)=="green"){
-            gui.getEast().setBackground(Color.green);
-            gui.getWest().setBackground(Color.green);
-        } else if(colorsEW.get(0)=="yellow"){
-            gui.getEast().setBackground(Color.yellow);
-            gui.getWest().setBackground(Color.yellow);
-        }
-
-        if (colorsNS.get(0)=="redall"){
-            System.out.println("Our System is being initialized");
-            gui.getNorth().setBackground(Color.red);
-            gui.getSouth().setBackground(Color.red);
-            gui.getEast().setBackground(Color.red);
-            gui.getWest().setBackground(Color.red);
-        
-        }
-    }
+      
+}
     
-    public void PedestrianButton(boolean state) throws InterruptedException{
-       
-       if(state){
-        System.out.println("Pedestrian Button is pressed!");
-        timer.Reset();
-        
-        gui.getNorth().setBackground(Color.yellow);
-        gui.getSouth().setBackground(Color.yellow);
-        gui.getEast().setBackground(Color.red);
-        gui.getWest().setBackground(Color.red);
-        //timer.n=2;
-         gui.getjButton2().setEnabled(!state);
-        
-       }
-       else{
-            gui.getjButton2().setEnabled(!state);
-       }
+    public void Reset(boolean stop) {
+        if (stop == true) {
+            this.timer.Reset();
+            this.gui.dispose();         
+            Main.main(null);
+            gui.getOnBtn().setEnabled(true);
+            gui.getOffBtn().setEnabled(false);
+            gui.getjButton2().setEnabled(false);
+            gui.getjButton3().setEnabled(false);
+
+        }
     }
+
 }

@@ -7,11 +7,15 @@ package esper;
 import com.espertech.esper.client.EPServiceProvider;
 import com.espertech.esper.client.EPServiceProviderManager;
 import com.espertech.esper.client.EPStatement;
-import events.LightsColor;
-import events.PedestrianButtonClicked;
-import events.PowerEvent;
+import events.LightsColorEW;
 
+import events.LightsColorNS;
+import events.PedestrianButtonEWClicked;
+import events.PedestrianButtonNSClicked;
+import events.PowerEvent;
+import events.StopSystem;
 import events.TimerReading;
+import events.changeDirection;
 
 /**
  *
@@ -24,8 +28,13 @@ public class Config {
     public static void registerEvents() {
         engine.getEPAdministrator().getConfiguration().addEventType(PowerEvent.class);
         engine.getEPAdministrator().getConfiguration().addEventType(TimerReading.class);
-        engine.getEPAdministrator().getConfiguration().addEventType(LightsColor.class);
-       engine.getEPAdministrator().getConfiguration().addEventType(PedestrianButtonClicked.class);
+        engine.getEPAdministrator().getConfiguration().addEventType(LightsColorNS.class);
+        engine.getEPAdministrator().getConfiguration().addEventType(LightsColorEW.class);
+       engine.getEPAdministrator().getConfiguration().addEventType(PedestrianButtonNSClicked.class);
+       engine.getEPAdministrator().getConfiguration().addEventType(PedestrianButtonEWClicked.class);
+        engine.getEPAdministrator().getConfiguration().addEventType(StopSystem.class);
+        engine.getEPAdministrator().getConfiguration().addEventType(changeDirection.class);
+        System.out.println("Our System is being initialized");
         System.out.println("Events Successfully Registered.");
     }
 

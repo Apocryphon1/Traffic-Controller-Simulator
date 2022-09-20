@@ -5,7 +5,9 @@
  */
 package esper;
 
+import events.PedestrianButtonNSClicked;
 import java.util.ArrayList;
+import model.PedestrianButton;
 import model.TrafficController;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
@@ -43,18 +45,53 @@ public class Main {
                         tc.setState(state);
                     }
                 });
-        Config.createStatement("select colors from LightsColor")
+        Config.createStatement("select colors from LightsColorNS")
                 .setSubscriber(new Object() {
                     public void update(ArrayList<String> colorsNS) {
-                        tc.Colors(colorsNS, colorsNS);
+                        tc.ColorsNS(colorsNS);
+                         
                     }
+                   
                 });
-         Config.createStatement("select state from PedestrianButtonClicked")
+              Config.createStatement("select colors from LightsColorEW")
+                .setSubscriber(new Object() {
+                    public void update(ArrayList<String> colorsEW) {
+                        tc.ColorsEW(colorsEW);
+                         
+                    }
+                   
+                });
+         Config.createStatement("select state from PedestrianButtonNSClicked")
                 .setSubscriber(new Object() {
                     public void update(boolean state) throws InterruptedException{
-                        tc.PedestrianButton(state);
+                        tc.setpClickedNS(true);
+                        tc.buttonStatusNS(state);      
                     }
                 });
+          Config.createStatement("select state from PedestrianButtonEWClicked")
+                .setSubscriber(new Object() {
+                    public void update(boolean state) throws InterruptedException{                      
+                        tc.setpClickedEW(true);
+                        tc.buttonStatusEW(state);
+                    }
+                });
+          
+
+              Config.createStatement("select stop from StopSystem")
+                .setSubscriber(new Object() {
+                    public void update(boolean stop) throws InterruptedException{
+                       
+                        tc.Reset(stop);
+                       
+                    }
+                });
+              Config.createStatement("select direction from changeDirection")
+                .setSubscriber(new Object() {
+                    public void update(String direction) throws InterruptedException{
+                       tc.requestChangeDirection(direction);                     
+                    }
+                });
+             
     }
 
 }
